@@ -1,24 +1,23 @@
 let currentInput = '';
 let previousInput = '';
 let operator = '';
-let resultCalculated = false; // Variabile di stato per controllare se il risultato è stato calcolato
-
+let resultCalculated = false; // checks if the result has been calculated
 function addToDisplay(value) {
     if (resultCalculated) {
-        // Se il risultato è stato calcolato, comincia un nuovo calcolo con il risultato precedente
+        // if the result has been calculated, starts a new operation from the current result
         currentInput = value;
         resultCalculated = false;
     } else {
-        // Se il display è "0", sostituirlo con il numero premuto (ma non accettare più zeri consecutivi)
+        // If the display is set to "0", substitute with the input number. Multiple "0" are not allowed
         if (currentInput === '0' && value === '0') {
-            return; // Non fare nulla se si preme "0" quando il display è già "0"
+            return; // Don't do anything when "0" is already displayed
         }
 
-        // Se si preme la virgola, aggiungiamola solo se non è già presente
+        // Adds a comma after checking if it's already present
         if (value === ',' && !currentInput.includes(',')) {
             currentInput += value;
         } else if (value !== ',') {
-            // Se il valore non è una virgola, aggiungiamo il numero normalmente
+            // If the number is int, add it normally
             if (currentInput === '0') {
                 currentInput = value;
             } else {
@@ -27,9 +26,9 @@ function addToDisplay(value) {
         }
     }
 
-    // Limita la lunghezza del numero a 13 caratteri
-    if (currentInput.length > 13) {
-        currentInput = currentInput.slice(0, 13);
+    // Limits input to a length of 11
+    if (currentInput.length > 11) {
+        currentInput = currentInput.slice(0, 11);
     }
 
     updateDisplay(currentInput);
@@ -39,7 +38,7 @@ function clearDisplay() {
     currentInput = '';
     previousInput = '';
     operator = '';
-    resultCalculated = false; // Resetta lo stato dopo un "CE"
+    resultCalculated = false; // resets the state after "CE" is pressed
     updateDisplay('0');
 }
 
@@ -60,7 +59,7 @@ function calculate() {
     if (previousInput === '' || currentInput === '') return;
 
     let result;
-    // Sostituire la virgola con il punto per gestire correttamente i numeri float
+    // Switches the "." with a comma for floats (The dev is european)
     const num1 = parseFloat(previousInput.replace(',', '.'));
     const num2 = parseFloat(currentInput.replace(',', '.'));
 
@@ -85,31 +84,35 @@ function calculate() {
             return;
     }
 
-    // Limita il risultato a 11 caratteri (inclusi decimali)
+      if (result < 0) {
+        result = 0; // Sets the result to "0" if the output is negative
+    }
+
+    // Limits result to 11 characters, floats included
     currentInput = formatResult(result);
     operator = '';
     previousInput = '';
-    resultCalculated = true; // Imposta lo stato su true dopo aver calcolato il risultato
+    resultCalculated = true; // Sets the state to true after the result is displayed
     updateDisplay(currentInput);
 }
 
 function formatResult(result) {
-    // Se il risultato è un numero, limitare a 11 caratteri
+    
     if (typeof result === 'number') {
         let resultStr = result.toString();
         
-        // Se è un numero molto lungo, troncare alla lunghezza desiderata
+        // Displays a maximum of 11 numbers for the result
         if (resultStr.length > 11) {
-            // Se il numero è un float, troncare alla lunghezza massima di 11 caratteri
-            resultStr = parseFloat(result).toFixed(10); // Limitiamo a 10 decimali
+            // same for floats
+            resultStr = parseFloat(result).toFixed(10); // limits the float to 10 decimals
         }
 
-        // Se il numero è negativo o contiene decimali, assicurarsi che il risultato non superi 11 caratteri
+        
         if (resultStr.length > 11) {
-            resultStr = resultStr.slice(0, 11); // Tronca a 11 caratteri
+            resultStr = resultStr.slice(0, 11); 
         }
 
-        // Sostituiamo il punto con la virgola per la visualizzazione
+        // Shows a comma in place of the point for float results
         return resultStr.replace('.', ',');
     }
     return result.toString();
@@ -122,11 +125,11 @@ function updateDisplay(value) {
 function showCat() {
     const catImage = document.getElementById('catImage');
 
-    // Se l'immagine è già visibile, nascondila
+    // If the image is visible, hide it
     if (catImage.style.display === 'block') {
         catImage.style.display = 'none';
     } else {
-        // Altrimenti, mostra l'immagine
+        // Show the image
         catImage.style.display = 'block';
     }
 }
